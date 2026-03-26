@@ -4,12 +4,10 @@ import viteLogo from "./assets/vite.svg";
 import heroImg from "./assets/hero.png";
 import "./App.css";
 import Home from "./pages/Home";
-import ChatRoom from "./pages/ChatRoom";
+import ChatRoom from "./pages/ChatPage";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <BrowserRouter>
       <Routes>

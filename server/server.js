@@ -6,11 +6,16 @@ const cors = require("cors");
 const app = express();
 app.use(cors());
 
+app.get("/", (req, res) => {
+  res.send("Server is running");
+});
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "http://192.168.31.241:5173"],
+    methods: ["GET", "POST"],
   },
 });
 
@@ -37,6 +42,6 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(3000, () => {
+server.listen(3000, "192.168.31.241", () => {
   console.log("Server running on port 3000");
 });
