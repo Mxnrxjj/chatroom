@@ -8,7 +8,7 @@ import MessageInput from "../components/layout/MessageInput";
 
 function Chat() {
   const location = useLocation();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { username, roomName } = location.state;
 
   const [message, setMessage] = useState("");
@@ -19,6 +19,7 @@ function Chat() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeRoom, setActiveRoom] = useState(null);
   const messagesEndRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
 
   // Join room when component loads
   useEffect(() => {
@@ -40,7 +41,7 @@ function Chat() {
       socket.off("typing");
       socket.off("stop-typing");
     };
-  }, []);
+  }, [username, roomName]);
 
   const sendMessage = () => {
     if (message.trim() === "") return;
@@ -49,17 +50,43 @@ function Chat() {
       username,
       roomName,
       message,
+      time: new Date().toLocaleTimeString(),
     };
 
     socket.emit("send-message", messageData);
+    socket.emit("stop-typing", { username, roomName });
+    setIsTyping(false);
+
     setMessages((prev) => [...prev, messageData]);
     setMessage("");
   };
+
+  const msgData = {};
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({
       behavior: "smooth",
     });
+  };
+
+  const handleTyping = (e) => {
+    setMessage(e.target.value);
+
+    // Emit typing event
+    if (!isTyping) {
+      setIsTyping(true);
+      socket.emit("typing", { username, roomName });
+    }
+
+    // Clear previous timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      socket.emit("stop-typing", { username, roomName });
+      setIsTyping(false);
+    }, 1500); //1.5 seconds of inactivity will trigger stop-typing
   };
 
   useEffect(() => {
@@ -90,6 +117,7 @@ function Chat() {
         <MessageInput
           message={message}
           setMessage={setMessage}
+          handleTyping={handleTyping}
           sendMessage={sendMessage}
         />
       </div>
