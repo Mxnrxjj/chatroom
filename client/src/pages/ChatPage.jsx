@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import socket from "../socket";
 import MessageList from "../components/layout/MessageList";
@@ -18,6 +18,7 @@ function Chat() {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeRoom, setActiveRoom] = useState(null);
+  const messagesEndRef = useRef(null);
 
   // Join room when component loads
   useEffect(() => {
@@ -54,6 +55,17 @@ function Chat() {
     setMessages((prev) => [...prev, messageData]);
     setMessage("");
   };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   return (
     <div className="flex h-screen">
       <SideBar
@@ -72,6 +84,7 @@ function Chat() {
           currentUser={username}
           typingUsers={typingUsers}
           activeRoom={activeRoom}
+          messagesEndRef={messagesEndRef}
         />
 
         <MessageInput

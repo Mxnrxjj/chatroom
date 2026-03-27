@@ -6,7 +6,7 @@ function MessageList({
   currentUser,
   typingUsers,
   activeRoom,
-  //   messageEndRef,
+  messagesEndRef,
 }) {
   return (
     <div className="flex-1 overflow-y-auto p-4 pt-20">
@@ -32,7 +32,7 @@ function MessageList({
       })}
 
       <TypingIndicator typingUsers={typingUsers} />
-      {/* <div ref={messageEndRef} /> */}
+      <div ref={messagesEndRef} />
     </div>
   );
 }
