@@ -15,7 +15,8 @@ function MessageInput({ message, setMessage, handleTyping, sendMessage }) {
     >
       <button
         type="button"
-        className="p-2 rounded-full bg-gray-200 text-gray-400 focus:text-blue-500 hover:bg-gray-300 focus:rotate-45  transition-transform"
+        className="p-2 rounded-full bg-gray-200 text-gray-400 focus:text-blue-500 
+                    hover:bg-gray-300 focus:rotate-45  transition-transform"
         onClick={() => {}}
       >
         <Plus className="" />
