@@ -25,3 +25,6 @@ dist-ssr
 project_tree.md
 project_tree.json
 project_tree.html
+.env
+client/.env
+server/.env
