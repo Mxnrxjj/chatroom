@@ -1,15 +1,14 @@
 import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import socket from "../socket";
+import socket from "../socket/socket";
 import MessageList from "../components/layout/MessageList";
 import SideBar from "../components/layout/Sidebar";
 import ChatHeader from "../components/layout/ChatHeader";
 import MessageInput from "../components/layout/MessageInput";
 
 function Chat() {
-  const location = useLocation();
+  // const location = useLocation();
   // const navigate = useNavigate();
-  const { username, roomName } = location.state;
 
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
@@ -22,40 +21,36 @@ function Chat() {
   const typingTimeoutRef = useRef(null);
 
   // Join room when component loads
-  useEffect(() => {
-    socket.emit("join-room", { username, roomName });
-    socket.on("receive-message", (data) => {
-      setMessages((prev) => [...prev, data]);
-    });
+  // useEffect(() => {
+  //   socket.emit("join-room", { roomName });
+  //   socket.on("receive-message", (data) => {
+  //     setMessages((prev) => [...prev, data]);
+  //   });
 
-    socket.on("typing", ({ username }) => {
-      setTypingUsers((prev) => [...new Set([...prev, username])]);
-    });
+  //   socket.on("typing", ({ username }) => {
+  //     setTypingUsers((prev) => [...new Set([...prev, username])]);
+  //   });
 
-    socket.on("stop-typing", ({ username }) => {
-      setTypingUsers((prev) => prev.filter((u) => u !== username));
-    });
+  //   socket.on("stop-typing", ({ username }) => {
+  //     setTypingUsers((prev) => prev.filter((u) => u !== username));
+  //   });
 
-    return () => {
-      socket.off("receive-message");
-      socket.off("typing");
-      socket.off("stop-typing");
-    };
-  }, [username, roomName]);
+  //   return () => {
+  //     socket.off("receive-message");
+  //     socket.off("typing");
+  //     socket.off("stop-typing");
+  //   };
+  // }, []);
 
   const sendMessage = () => {
     if (message.trim() === "") return;
 
     const messageData = {
-      username,
-      roomName,
-      message,
-      time: new Date().toLocaleTimeString(),
+      content: message,
+      chatId: activeRoom,
     };
 
     socket.emit("send-message", messageData);
-    socket.emit("stop-typing", { username, roomName });
-    setIsTyping(false);
 
     setMessages((prev) => [...prev, messageData]);
     setMessage("");
@@ -104,11 +99,11 @@ function Chat() {
 
       {/* ChatArea */}
       <div className="flex flex-col flex-1">
-        <ChatHeader activeRoom={roomName} setIsSidebarOpen={setIsSidebarOpen} />
+        <ChatHeader activeRoom={1} setIsSidebarOpen={setIsSidebarOpen} />
 
         <MessageList
           messages={messages}
-          currentUser={username}
+          currentUser={1}
           typingUsers={typingUsers}
           activeRoom={activeRoom}
           messagesEndRef={messagesEndRef}

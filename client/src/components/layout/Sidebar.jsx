@@ -1,5 +1,8 @@
 import React from "react";
 import { Edit, Search, Hash, Settings } from "lucide-react";
+import { getCurrentUser } from "../../utils/auth";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function Sidebar({
   activeRoom,
@@ -7,6 +10,11 @@ function Sidebar({
   isSidebarOpen,
   setIsSidebarOpen,
 }) {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const currentUser = user;
+  const [showSettings, setShowSettings] = React.useState(false);
+
   return (
     <>
       {/* Background Overlay */}
@@ -60,15 +68,39 @@ function Sidebar({
         <div className="mt-auto p-4 bg-white border-gray-300 border-t flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="font-semibold w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center">
-              M
+              {currentUser?.username?.charAt(0)}
             </div>
             <div>
-              <p className="text-sm font-semibold">Manraj Singh</p>
+              <p className="text-sm font-semibold">{currentUser?.username}</p>
             </div>
           </div>
-          <button className="p-2 hover:bg-gray-200 rounded-full hover:rotate-[90deg] transition-transform duration-300">
-            <Settings className="hover:cursor-pointer " />
+          <button
+            className={`p-2 hover:bg-gray-200 rounded-full 
+                      transition-transform duration-300 ${showSettings ? "rotate-[90deg]" : ""}`}
+            onClick={() => setShowSettings((prev) => !prev)}
+          >
+            <Settings className="hover:cursor-pointer" />
           </button>
+          {/* Dropdown Box */}
+          {showSettings && (
+            <div className="absolute right-0 bottom-12 w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
+              <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">
+                Profile
+              </button>
+              <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm">
+                Settings
+              </button>
+              <button
+                onClick={() => {
+                  logout();
+                  navigate("/login");
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-red-500"
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </aside>
     </>
