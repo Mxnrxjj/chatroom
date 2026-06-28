@@ -1,11 +1,16 @@
 import React from "react";
 import { Plus, SendHorizontal } from "lucide-react";
 
-function MessageInput({ message, setMessage, handleTyping, sendMessage }) {
+function MessageInput({
+  message,
+  setMessage,
+  handleTyping,
+  handleSendMessage,
+}) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!message.trim()) return;
-    sendMessage();
+    handleSendMessage();
   };
 
   return (
@@ -16,7 +21,7 @@ function MessageInput({ message, setMessage, handleTyping, sendMessage }) {
       <button
         type="button"
         className="p-2 rounded-full bg-gray-200 text-gray-400 focus:text-blue-500 
-                    hover:bg-gray-300 focus:rotate-45  transition-transform"
+                    hover:bg-gray-300 focus:rotate-45  transition-transform dark:bg-[#111B21]"
         onClick={() => {}}
       >
         <Plus className="" />
@@ -27,7 +32,7 @@ function MessageInput({ message, setMessage, handleTyping, sendMessage }) {
         value={message}
         className="bg-gray-100 w-full text-gray-700 placeholder:text-gray-500 
                     border border-gray-300 rounded-full py-2 px-4 focus:outline-none
-                    focus:ring-2 focus:ring-blue-500"
+                    focus:ring-2 focus:ring-blue-500 dark:bg-[#111B21] dark:text-white"
         onChange={handleTyping}
       />
       <button

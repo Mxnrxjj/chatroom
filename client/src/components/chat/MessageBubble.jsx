@@ -1,5 +1,7 @@
 import Avatar from "../chat/Avatar";
 import { useMemo } from "react";
+import { formatMessageTime } from "../../utils/formatTime";
+
 function MessageBubble({ msg, isMe, isFirstInGroup, isLastInGroup }) {
   let roundedClasses = "rounded-[20px]";
   if (isMe) {
@@ -27,7 +29,7 @@ function MessageBubble({ msg, isMe, isFirstInGroup, isLastInGroup }) {
     return colors[hash % colors.length];
   };
 
-  const randomColor = getColor(msg.username);
+  const randomColor = getColor(msg.sender.username);
 
   return (
     <div
@@ -39,7 +41,7 @@ function MessageBubble({ msg, isMe, isFirstInGroup, isLastInGroup }) {
           {isLastInGroup && (
             <Avatar
               color={randomColor}
-              initials={msg.username[0].toUpperCase()}
+              initials={msg.sender.username[0].toUpperCase()}
             />
           )}
         </div>
@@ -49,14 +51,17 @@ function MessageBubble({ msg, isMe, isFirstInGroup, isLastInGroup }) {
       >
         {isFirstInGroup && !isMe && (
           <span className="text-xs text-gray-500 ml-3 mb-1">
-            {msg.username}
+            {msg.sender.username}
           </span>
         )}
         <div
           className={`px-4 py-2 shadow-sm ${roundedClasses} 
-            ${isMe ? "bg-blue-500 text-white" : "bg-gray-200 text-black"}`}
+            ${isMe ? "bg-blue-500 text-white" : "bg-gray-200 dark:bg-gray-400 text-black"}`}
         >
-          {msg.message}
+          {msg.content}
+        </div>
+        <div className="mt-1 text-right text-[11px] opacity-70 dark:text-gray-400">
+          {formatMessageTime(msg.createdAt)}
         </div>
         {isLastInGroup && isMe && (
           <span className="text-xs text-gray-400 mt-1 mr-1">Delivered</span>

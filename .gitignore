@@ -25,3 +25,8 @@ dist-ssr
 project_tree.md
 project_tree.json
 project_tree.html
+
+# Environment files
+.env
+.env.*
+!.env.example

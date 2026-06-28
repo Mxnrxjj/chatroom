@@ -76,6 +76,7 @@ const loginUser = async (req, res) => {
             username: user.username,
             email: user.email,
             token: generateToken(user._id),
+            avatar: user.avatar
         });
 
     } catch (error) {
@@ -86,18 +87,18 @@ const loginUser = async (req, res) => {
 
 const getUsers = async (req, res) => {
     try {
-        const keyword = req.query.search
-            ? {
-                $or: [
-                    { username: { $regex: req.query.search, $options: "i" } },
-                    { email: { $regex: req.query.search, $options: "i" } },
-                ],
-            }
-            : {};
+        const search = req.query.search;
 
-        const users = await User.find(keyword)
-            .find({ _id: { $ne: req.user._id } })
-            .select("-password");
+        if (!search) {
+            return res.json([]);
+        }
+
+        const users = await User.find({
+            _id: { $ne: req.user._id },
+            username: { $regex: `${search}`, $options: "i" },
+        })
+            .select("_id username avatar")
+            .limit(10);
 
         res.json(users);
 

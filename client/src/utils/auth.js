@@ -2,7 +2,14 @@ import socket from "../socket/socket";
 
 export const setAuth = (data) => {
     localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data));
+
+    const user = {
+        _id: data._id,
+        username: data.username,
+        email: data.email,
+        avatar: data.avatar,
+    }
+    localStorage.setItem("user", JSON.stringify(user));
 };
 
 export const getToken = () => {
@@ -10,13 +17,18 @@ export const getToken = () => {
 };
 
 export const getCurrentUser = () => {
-    return JSON.parse(localStorage.getItem("user"));
+    try {
+        const user = localStorage.getItem("user");
+        return user ? JSON.parse(user) : null;
+    } catch (err) {
+        console.error("Corrupted user in storage");
+        localStorage.removeItem("user");
+        return null;
+    }
 };
 
 export const logout = () => {
-    if (socket.connected) {
-        socket.disconnect();
-    }
+    socket.disconnect();
 
     localStorage.removeItem("token");
     localStorage.removeItem("user");

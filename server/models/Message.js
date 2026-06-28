@@ -11,12 +11,19 @@ const messageSchema = new mongoose.Schema(
             type: String,
             required: true,
             trim: true,
+            maxlength: 65_536, // 64KB
         },
         chat: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Chat",
             required: true,
-        }
+        },
+        readBy: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            }
+        ]
     },
     {
         timestamps: true,
