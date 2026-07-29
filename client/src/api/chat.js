@@ -1,34 +1,5 @@
 const API = import.meta.env.VITE_API_URL;
 
-// export const createOrGetChat = async (userId, token) => {
-//     const res = await fetch(`${API}/chats`, {
-//         method: "POST",
-//         headers: {
-//             "Content-Type": "application/json",
-//             Authorization: `Bearer ${token}`,
-//         },
-//         body: JSON.stringify({ userId }),
-//     });
-//     if (!res.ok) {
-//         const err = await res.json();
-//         throw new Error(err.message || "Failed to create or get chat");
-//     }
-//     return res.json();
-// }
-
-// export const getMyChats = async (token) => {
-//     const res = await fetch(`${API}/chats`, {
-//         headers: {
-//             Authorization: `Bearer ${token}`,
-//         },
-//     });
-//     if (!res.ok) {
-//         const err = await res.json();
-//         throw new Error(err.message || "Failed to fetch chats");
-//     }
-//     return res.json();
-// }
-
 import { authFetch } from "../utils/authFetch";
 
 export const createOrGetChat = async (userId) => {
@@ -45,5 +16,51 @@ export const getMyChats = async () => {
 export const markChatAsRead = async (chatId) => {
     await authFetch(`${API}/chats/${chatId}/read`, {
         method: "PUT",
+    });
+};
+
+export const enableChatSecurity = async (pin) => {
+    return authFetch(`${API}/chats/chat-security`, {
+        method: "PUT",
+        body: JSON.stringify({ pin }),
+    });
+};
+
+export const changeChatPin = async (currentPin, newPin) => {
+    return authFetch(`${API}/chats/chat-security/pin`, {
+        method: "PUT",
+        body: JSON.stringify({ currentPin, newPin }),
+    });
+};
+
+export const disableChatSecurity = async (pin) => {
+    return authFetch(`${API}/chats/chat-security/disable`, {
+        method: "PUT",
+        body: JSON.stringify({ pin }),
+    });
+};
+
+export const lockChat = async (chatId) => {
+    return authFetch(`${API}/chats/${chatId}/lock`, {
+        method: "PUT",
+    });
+};
+
+export const unlockChat = async (chatId) => {
+    return authFetch(`${API}/chats/${chatId}/unlock`, {
+        method: "PUT",
+    });
+};
+
+export const verifyChatPin = async (pin) => {
+    return authFetch(`${API}/chats/chat-security/verify`, {
+        method: "POST",
+        body: JSON.stringify({ pin }),
+    });
+};
+
+export const deleteChat = async (chatId) => {
+    return authFetch(`${API}/chats/${chatId}`, {
+        method: "DELETE",
     });
 };

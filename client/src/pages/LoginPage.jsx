@@ -28,7 +28,6 @@ const App = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
 
     if (isLogin) {
       try {
@@ -43,10 +42,10 @@ const App = () => {
             username: res.username,
             email: res.email,
             avatar: res.avatar,
+            bio: res.bio,
+            chatSecurity: res.chatSecurity,
           });
           setToken(res.token);
-
-          console.log("Login successful, token stored:", res.token);
 
           // Navigate to chat page
           navigate("/chat");

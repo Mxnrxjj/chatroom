@@ -52,6 +52,11 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
+  const updateUser = (updatedUser) => {
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  };
+
   const logout = () => {
     // Clear socket auth and disconnect
     logutUtil();
@@ -61,7 +66,15 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, token, setUser, setToken, logout, isAuthReady }}
+      value={{
+        user,
+        token,
+        setUser,
+        setToken,
+        updateUser,
+        logout,
+        isAuthReady,
+      }}
     >
       {children}
     </AuthContext.Provider>

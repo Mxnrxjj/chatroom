@@ -1,4 +1,5 @@
 const API = import.meta.env.VITE_API_URL;
+import { authFetch } from "../utils/authFetch";
 
 const registerUser = async (userData) => {
     const res = await fetch(
@@ -11,7 +12,7 @@ const registerUser = async (userData) => {
             body: JSON.stringify(userData),
         },
     );
-    // console.log("Registration response:", res);
+
     const data = await res.json();
 
     if (!res.ok) {
@@ -35,4 +36,14 @@ const loginUser = async (userData) => {
     return data;
 };
 
-export { registerUser, loginUser };
+const changePassword = async (currentPassword, newPassword) => {
+    return authFetch(`${API}/users/change-password`, {
+        method: "PUT",
+        body: JSON.stringify({
+            currentPassword,
+            newPassword,
+        }),
+    });
+};
+
+export { registerUser, loginUser, changePassword };

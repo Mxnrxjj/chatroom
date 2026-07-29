@@ -12,16 +12,13 @@ module.exports = (io) => {
     io.use(async (socket, next) => {
         try {
             const token = socket.handshake.auth.token;
-            console.log("TOKEN:", socket.handshake.auth.token);
 
             if (!token) {
                 return next(new Error("Not Authenticated"));
             }
 
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            console.log("DECODED:", decoded);
             const user = await User.findById(decoded.id).select("-password");
-            console.log("USER:", user);
 
             socket.user = user;
 
@@ -42,7 +39,6 @@ module.exports = (io) => {
     };
 
     io.on("connection", (socket) => {
-        console.log("User connected: ", socket.user.username);
 
         const userId = socket.user._id.toString();
 
@@ -54,15 +50,12 @@ module.exports = (io) => {
 
         broadcastPresence();
 
-        console.log("Presence Map:", presence);
-
 
         socket.join(userId); //Personal room for notifications
 
         // Join chat 
         socket.on("joinChat", (chatId) => {
             socket.join(chatId);
-            console.log(`${socket.user.username} joined the chat : ${chatId}`);
         });
 
         socket.on("typing", ({ chatId, userId }) => {
@@ -84,7 +77,6 @@ module.exports = (io) => {
         });
 
         socket.on("disconnect", () => {
-            console.log("User disconnected: " + socket.id);
 
             const user = presence.get(userId);
 

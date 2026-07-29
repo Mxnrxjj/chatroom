@@ -10,7 +10,13 @@ import { sendMessage, fetchMessages as fetchMessagesAPI } from "../api/message";
 import { Lock, Bird } from "lucide-react";
 import { markChatAsRead } from "../api/chat";
 
+import PinSetupModal from "../components/security/PinSetupModal";
+import { verifyChatPin } from "../api/chat";
+
 function Chat() {
+  const [showPinModal, setShowPinModal] = useState(false);
+  const [pendingChat, setPendingChat] = useState(null);
+
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   // const [typingUsers, setTypingUsers] = useState([]);
@@ -54,8 +60,6 @@ function Chat() {
         };
 
         markRead();
-
-        console.log("Fetched messages:", data);
       } catch (error) {
         console.error("Error fetching messages:", error);
       }
@@ -70,7 +74,6 @@ function Chat() {
 
     // Listen for new messages
     const handleNewMessage = (msg) => {
-      console.log("Received new message:", msg);
       if (msg.sender._id === currentUser._id) return;
       if (msg.chat._id !== selectedChat._id) return;
 
@@ -78,7 +81,6 @@ function Chat() {
 
       const distanceFromBottom =
         el.scrollHeight - el.scrollTop - el.clientHeight;
-      console.log(distanceFromBottom);
       const isNearBottom = distanceFromBottom < 450;
 
       setMessages((prev) => [...prev, msg]);
@@ -111,7 +113,6 @@ function Chat() {
     if (selectedChat.isTemporary) {
       setChats((prev) => {
         const updated = [newMsg.chat, ...prev];
-        console.log("Updated Chats:", updated);
         return updated;
       });
       setTempChat(null);
@@ -207,6 +208,8 @@ function Chat() {
       <SideBar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
+        setShowPinModal={setShowPinModal}
+        setPendingChat={setPendingChat}
       />
       {selectedChat ? (
         // ChatArea
@@ -257,6 +260,27 @@ function Chat() {
           </div>
         </div>
       )}
+      <PinSetupModal
+        open={showPinModal}
+        title="Unlock Chat"
+        description="Enter your PIN to unlock this chat."
+        onClose={() => {
+          setShowPinModal(false);
+          setPendingChat(null);
+        }}
+        onComplete={async (pin) => {
+          try {
+            await verifyChatPin(pin);
+
+            setSelectedChat(pendingChat);
+
+            setPendingChat(null);
+            setShowPinModal(false);
+          } catch (err) {
+            alert(err.message);
+          }
+        }}
+      />
     </div>
   );
 }

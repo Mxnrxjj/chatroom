@@ -45,14 +45,8 @@ export const ChatProvider = ({ children }) => {
     }
   }, [token]);
 
-  // useEffect(() => {
-  //   if (chats.length === 0) return;
-  //   console.log("Chats:", chats);
-  // }, [chats]);
-
   useEffect(() => {
     socket.on("presence", (data) => {
-      // console.log("Presence received:", data);
       setPresence(data);
     });
 

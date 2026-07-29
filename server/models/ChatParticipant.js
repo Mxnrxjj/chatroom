@@ -54,12 +54,14 @@ const chatParticipantSchema = new mongoose.Schema(
                 default: false,
             },
 
-            pin: {
-                type: String,
+            lockedAt: {
+                type: Date,
                 default: null,
             },
-
-            pinChangedAt: Date,
+        },
+        hidden: {
+            type: Boolean,
+            default: false,
         },
 
         lockedAt: Date,

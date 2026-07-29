@@ -1,15 +1,24 @@
 import { useState } from "react";
 import { ShieldCheck, Lock, KeyRound } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import { enableChatSecurity } from "../../api/chat";
 
 import SettingsSection from "../../components/settings/SettingsSection";
 import SettingsCard from "../../components/settings/SettingsCard";
 import PinSetupModal from "../../components/security/PinSetupModal";
+import ChangePinModal from "../../components/security/ChangePinModal";
+import DisableChatSecurityModal from "../../components/security/DisableChatSecurityModal";
+import ChangePasswordModal from "../../components/security/ChangePasswordModal";
 
 export default function SecuritySettings() {
   const [showPinModal, setShowPinModal] = useState(false);
+  const [showChangePinModal, setShowChangePinModal] = useState(false);
+  const [showDisableModal, setShowDisableModal] = useState(false);
   const [confirmMode, setConfirmMode] = useState(false);
   const [firstPin, setFirstPin] = useState("");
-  const [chatLockEnabled, setChatLockEnabled] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const { user, updateUser } = useAuth();
+  const chatLockEnabled = user.chatSecurity?.enabled;
 
   const closeModal = () => {
     setShowPinModal(false);
@@ -17,15 +26,13 @@ export default function SecuritySettings() {
     setFirstPin("");
   };
 
-  const handlePinComplete = (pin) => {
-    // First step → Create PIN
+  const handlePinComplete = async (pin) => {
     if (!confirmMode) {
       setFirstPin(pin);
       setConfirmMode(true);
       return;
     }
 
-    // Second step → Confirm PIN
     if (pin !== firstPin) {
       alert("PINs do not match.");
       setConfirmMode(false);
@@ -33,11 +40,15 @@ export default function SecuritySettings() {
       return;
     }
 
-    // TODO:
-    // await setupChatLock(pin);
+    try {
+      const data = await enableChatSecurity(pin);
 
-    setChatLockEnabled(true);
-    closeModal();
+      updateUser(data.user);
+
+      closeModal();
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   return (
@@ -85,11 +96,17 @@ export default function SecuritySettings() {
               </button>
             ) : (
               <div className="flex gap-3">
-                <button className="rounded-xl border border-gray-300 dark:border-[#2A3942] px-5 py-2.5 hover:bg-gray-100 dark:hover:bg-[#2A3942]">
+                <button
+                  onClick={() => setShowChangePinModal(true)}
+                  className="rounded-xl border border-gray-300 dark:border-[#2A3942] px-5 py-2.5 hover:bg-gray-100 dark:hover:bg-[#2A3942]"
+                >
                   Change PIN
                 </button>
 
-                <button className="rounded-xl bg-red-500 px-5 py-2.5 text-white hover:bg-red-600">
+                <button
+                  onClick={() => setShowDisableModal(true)}
+                  className="rounded-xl bg-red-500 px-5 py-2.5 text-white hover:bg-red-600"
+                >
                   Disable
                 </button>
               </div>
@@ -120,7 +137,10 @@ export default function SecuritySettings() {
               </div>
             </div>
 
-            <button className="rounded-xl border border-gray-300 dark:border-[#2A3942] px-5 py-2.5 hover:bg-gray-100 dark:hover:bg-[#2A3942]">
+            <button
+              onClick={() => setShowPasswordModal(true)}
+              className="rounded-xl border border-gray-300 dark:border-[#2A3942] px-5 py-2.5 hover:bg-gray-100 dark:hover:bg-[#2A3942]"
+            >
               Change Password
             </button>
           </div>
@@ -139,6 +159,21 @@ export default function SecuritySettings() {
         }
         onClose={closeModal}
         onComplete={handlePinComplete}
+      />
+
+      <ChangePinModal
+        open={showChangePinModal}
+        onClose={() => setShowChangePinModal(false)}
+      />
+
+      <DisableChatSecurityModal
+        open={showDisableModal}
+        onClose={() => setShowDisableModal(false)}
+      />
+
+      <ChangePasswordModal
+        open={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
       />
     </>
   );

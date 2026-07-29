@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Pencil, UserCircle2 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import SettingsCard from "../../components/settings/SettingsCard";
 import SettingsSection from "../../components/settings/SettingsSection";
-// import { updateProfile } from "../../api/user";
+import { updateProfile } from "../../api/user";
 // import { toast } from "react-toastify";
 
 export default function ProfileSettings() {
-  const { user, setUser } = useAuth();
+  const { user, updateUser } = useAuth();
 
   const [form, setForm] = useState({
     username: user.username,
@@ -31,13 +31,21 @@ export default function ProfileSettings() {
 
   const handleSave = async () => {
     try {
-      //   const updatedUser = await updateProfile(form);
-      //   setUser(updatedUser);
-      //   toast.success("Profile updated successfully!");
-    } catch (error) {
-      //   toast.error(error.response?.data?.message || "Failed to update profile.");
+      const updatedUser = await updateProfile(form);
+
+      updateUser(updatedUser);
+    } catch (err) {
+      console.error(err);
     }
   };
+
+  useEffect(() => {
+    setForm({
+      username: user.username,
+      bio: user.bio || "",
+      avatar: user.avatar || "",
+    });
+  }, [user]);
 
   return (
     <SettingsSection>

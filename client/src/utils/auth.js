@@ -8,7 +8,9 @@ export const setAuth = (data) => {
         username: data.username,
         email: data.email,
         avatar: data.avatar,
-    }
+        bio: data.bio,
+        chatSecurity: data.chatSecurity,
+    };
     localStorage.setItem("user", JSON.stringify(user));
 };
 

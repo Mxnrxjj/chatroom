@@ -21,6 +21,11 @@ export default function PinSetupModal({
     }
   };
 
+  const handleClose = () => {
+    setPin("");
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
       <div className="w-full max-w-md rounded-2xl bg-white dark:bg-[#202C33] p-8">
@@ -33,7 +38,7 @@ export default function PinSetupModal({
         <PinInput value={pin} onChange={handleChange} />
 
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="mt-8 w-full rounded-xl border py-3"
         >
           Cancel

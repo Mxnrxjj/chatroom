@@ -7,7 +7,6 @@ const ChatParticipant = require('../models/ChatParticipant');
 const sendMessage = async (req, res) => {
     try {
         const { content, chatId, receiverId } = req.body;
-        console.log("Req received");
 
         if (!content) {
             return res.status(400).json({ message: 'Missing fields' });

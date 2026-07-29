@@ -7,7 +7,12 @@ import { useChat } from "../../context/ChatContext";
 import { getChatName } from "../../utils/chatName";
 import ThemeToggle from "../common/ThemeToggle";
 
-function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
+function Sidebar({
+  isSidebarOpen,
+  setIsSidebarOpen,
+  setShowPinModal,
+  setPendingChat,
+}) {
   const navigate = useNavigate();
   const { user: currentUser, logout } = useAuth();
   const [showSettings, setShowSettings] = React.useState(false);
@@ -176,13 +181,13 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
           </div>
           <div className="flex items-center relative gap-1">
             <ThemeToggle />
-            <button
+            {/* <button
               className={`p-2 hover:bg-gray-200 dark:hover:text-[#111B21] rounded-full transition-transform duration-300 
               ${showSettings ? "rotate-90" : ""}`}
               onClick={() => setShowSettings((prev) => !prev)}
             >
               <MessageCirclePlus className="hover:cursor-pointer" size={20} />
-            </button>
+            </button> */}
             <button
               className={`p-2 hover:bg-gray-200 dark:hover:text-[#111B21] rounded-full transition-transform duration-300 
               ${showSettings ? "rotate-90" : ""}`}
@@ -290,7 +295,7 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
             Unread
           </button>
 
-          <button
+          {/* <button
             onClick={() => handleTabChange("Groups")}
             className={`px-3 py-1 text-sm font-medium rounded-full transition-colors ${
               tab === "Groups"
@@ -299,7 +304,7 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
             }`}
           >
             Groups
-          </button>
+          </button> */}
         </div>
 
         {/* Direct Messages */}
@@ -326,7 +331,15 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
                 return (
                   <div
                     key={chat._id}
-                    onClick={() => setSelectedChat(chat)}
+                    onClick={() => {
+                      if (chat.isLocked) {
+                        setPendingChat(chat);
+                        setShowPinModal(true);
+                        return;
+                      }
+
+                      setSelectedChat(chat);
+                    }}
                     className={`flex items-center gap-3 p-2.5 rounded-xl cursor-pointer transition-colors ${
                       isSelected
                         ? "bg-blue-50 border border-blue-200"

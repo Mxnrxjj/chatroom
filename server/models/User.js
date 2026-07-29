@@ -44,6 +44,28 @@ const userSchema = new mongoose.Schema(
                 return `https://api.dicebear.com/7.x/avataaars/svg?seed=${id}&backgroundColor=${bg}`;
             },
         },
+        bio: {
+            type: String,
+            trim: true,
+            maxlength: 150,
+            default: "",
+        },
+        chatSecurity: {
+            enabled: {
+                type: Boolean,
+                default: false,
+            },
+
+            pin: {
+                type: String,
+                default: null,
+            },
+
+            pinChangedAt: {
+                type: Date,
+                default: null,
+            },
+        },
     },
     {
         timestamps: true
