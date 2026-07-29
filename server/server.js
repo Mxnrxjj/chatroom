@@ -9,7 +9,7 @@ const userRoutes = require("./routes/userRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 
-const allowedOrigins = [process.env.CLIENT_URL, "http://localhost:5173"];
+const allowedOrigins = [process.env.CLIENT_URL];
 
 const app = express();
 app.use(
@@ -21,11 +21,12 @@ app.use(
 app.use(express.json());
 
 const server = http.createServer(app);
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
+    methods: ["GET", "POST"],
     credentials: true,
   },
 });

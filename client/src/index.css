@@ -2,6 +2,10 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* Firefox */
 * {
   scrollbar-width: thin;
@@ -28,9 +32,18 @@
 }
 
 @keyframes flashBlue {
-  0% { background-color: #3b82f6; color: white; }
-  50% { background-color: white; color: #3b82f6; }
-  100% { background-color: #3b82f6; color: white; }
+  0% {
+    background-color: #3b82f6;
+    color: white;
+  }
+  50% {
+    background-color: white;
+    color: #3b82f6;
+  }
+  100% {
+    background-color: #3b82f6;
+    color: white;
+  }
 }
 
 .flash-blue:hover {
@@ -50,7 +63,9 @@
   opacity: 0;
   border-radius: 9999px;
   transform: scale(0);
-  transition: transform 0.4s, opacity 0.4s;
+  transition:
+    transform 0.4s,
+    opacity 0.4s;
 }
 
 .ripple:hover::after {

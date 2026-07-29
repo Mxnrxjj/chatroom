@@ -195,7 +195,7 @@ const App = () => {
                 ))}
               </div>
               <p className="text-teal-50 text-sm mt-2 font-medium">
-                Flying with 10k+ friends
+                Flying with friends
               </p>
             </div>
           </div>
