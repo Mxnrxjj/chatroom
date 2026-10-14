@@ -5,6 +5,6 @@ const { sendMessage, getMessages } = require('../controllers/messageController')
 const { protect } = require('../middleware/authMiddleware');
 
 router.post('/', protect, sendMessage);
-router.get('/:room', protect, getMessages);
+router.get('/', protect, getMessages);
 
 module.exports = router;

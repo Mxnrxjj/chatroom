@@ -9,10 +9,35 @@ const userRoutes = require("./routes/userRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 
+const allowedOrigins = [process.env.CLIENT_URL];
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
 app.use(express.json());
+
+const server = http.createServer(app);
+const PORT = process.env.PORT || 3000;
+
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
+require("./sockets/socket")(io);
+
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
 app.use("/api/users", userRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/chats", chatRoutes);
@@ -20,19 +45,6 @@ app.use("/api/chats", chatRoutes);
 app.get("/", (req, res) => {
   res.send("Server is running");
 });
-
-const server = http.createServer(app);
-const PORT = process.env.PORT || 3000;
-
-const io = new Server(server, {
-  cors: {
-    origin: ["http://localhost:5173", "http://192.168.31.239:5173"],
-    methods: ["GET", "POST"],
-  },
-});
-
-require("./sockets/socket")(io);
-
 
 // Start the server after successful database connection
 connectDB()

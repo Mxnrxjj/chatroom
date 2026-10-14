@@ -2,6 +2,9 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Message = require("../models/Message");
 const Chat = require("../models/Chat");
+const { log } = require("console");
+
+const presence = new Map();
 
 module.exports = (io) => {
 
@@ -9,16 +12,13 @@ module.exports = (io) => {
     io.use(async (socket, next) => {
         try {
             const token = socket.handshake.auth.token;
-            console.log("TOKEN:", socket.handshake.auth.token);
 
             if (!token) {
                 return next(new Error("Not Authenticated"));
             }
 
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            console.log("DECODED:", decoded);
             const user = await User.findById(decoded.id).select("-password");
-            console.log("USER:", user);
 
             socket.user = user;
 
@@ -28,42 +28,67 @@ module.exports = (io) => {
         }
     });
 
-    io.on("connection", (socket) => {
-        console.log("User connected: ", socket.user.username);
+    const broadcastPresence = () => {
+        const data = Array.from(presence.entries()).map(([userId, info]) => ({
+            userId,
+            status: info.status,
+            lastSeen: info.lastSeen,
+        }));
 
-        // Join room 
-        socket.on("join-chat", (chatId) => {
-            socket.join(chatId);
-            console.log(`${socket.user.username} joined the chat`);
+        io.emit("presence", data);
+    };
+
+    io.on("connection", (socket) => {
+
+        const userId = socket.user._id.toString();
+
+        presence.set(userId, {
+            socketId: socket.id,
+            status: "online",
+            lastSeen: new Date(),
         });
 
-        // Send message
-        socket.on("send-message", async (data) => {
-            try {
-                const { content, chatId } = data;
+        broadcastPresence();
 
-                // Save message to database0
-                const message = await Message.create({
-                    sender: socket.user._id,
-                    content,
-                    chat: chatId,
-                });
 
-                // Update latest message in chat
-                await Chat.findByIdAndUpdate(chatId, {
-                    latestMessage: message._id,
-                });
+        socket.join(userId); //Personal room for notifications
 
-                // Broadcast message to room
-                io.to(chatId).emit("receive-message", message);
+        // Join chat 
+        socket.on("joinChat", (chatId) => {
+            socket.join(chatId);
+        });
 
-            } catch (error) {
-                console.error("Error sending message: ", error);
-            }
+        socket.on("typing", ({ chatId, userId }) => {
+            socket.to(chatId).emit("typing", {
+                chatId,
+                user: {
+                    _id: socket.user._id,
+                    username: socket.user.username,
+                    avatar: socket.user.avatar,
+                }
+            });
+        });
+
+        socket.on("stopTyping", ({ chatId, userId }) => {
+            socket.to(chatId).emit("stopTyping", {
+                chatId,
+                userId: socket.user._id,
+            });
         });
 
         socket.on("disconnect", () => {
-            console.log("User disconnected: " + socket.id);
+
+            const user = presence.get(userId);
+
+            if (user) {
+                presence.set(userId, {
+                    ...user,
+                    status: "offline",
+                    lastSeen: new Date(),
+                })
+            }
+
+            broadcastPresence();
         });
     });
 }
